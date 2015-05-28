@@ -10,5 +10,20 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "le_dragon",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ledragon/charting.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ledragon/charting/issues"
+  },
+  "homepage": "https://github.com/Ledragon/charting",
+  "devDependencies": {
+    "browser-sync": "^2.7.6",
+    "gulp": "^3.8.11",
+    "gulp-tsc": "^0.10.0",
+    "gulp-typescript": "^2.7.5",
+    "typescript": "^1.5.0-beta"
+  }
 }
