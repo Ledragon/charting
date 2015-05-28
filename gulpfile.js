@@ -10,6 +10,15 @@ gulp.task('ts', function (){
 		.pipe(gulp.dest('./dist'));
 });
 
-gulp.task('browserSync', function () {
+gulp.task('watch-ts', function () {
+	gulp.watch(['./src/**/*.ts'], ['ts']);
+});
 
+gulp.task('browserSync', function () {
+	browserSync.init({
+        server: './',
+        index: './demo/index.html',
+        port: 3030,
+        files: ['./dist/*', './demo/index.html']
+    });
 });

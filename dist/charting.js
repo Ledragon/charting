@@ -4,13 +4,19 @@ var charting;
 (function (charting) {
     var chart = (function () {
         function chart(container) {
-            this._group = d3.select(container).append('g');
+            this.init(container);
         }
+        chart.prototype.init = function (container) {
+            this._group = d3.select(container).append('g');
+        };
         chart.prototype.draw = function () {
             var scale = d3.scale.linear();
+            scale.domain([0, 100]);
+            scale.range([0, 1]);
             var axis = d3.svg.axis();
-            scale.range();
+            this._group.call(axis);
         };
         return chart;
     })();
+    charting.chart = chart;
 })(charting || (charting = {}));
