@@ -10,6 +10,10 @@ gulp.task('ts', function (){
 		.pipe(gulp.dest('./dist'));
 });
 
+gulp.task('watch', ['watch-ts', 'browserSync'], function () {
+
+});
+
 gulp.task('watch-ts', function () {
 	gulp.watch(['./src/**/*.ts'], ['ts']);
 });

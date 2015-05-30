@@ -10,15 +10,39 @@ module charting {
 		
 		private init(container) {
 			this._group = d3.select(container).append('g');
+			this.draw();
 		}
 
 		draw() {
+			this.drawXAxis();
+			this.drawYAxis();
+		}
+		
+		private drawXAxis() {
 			var scale = d3.scale.linear();
 
-			scale.domain([0, 100]);
-			scale.range([0, 1]);
-			var axis = d3.svg.axis();
-			this._group.call(axis);
+			scale.domain([0, 1]);
+			scale.range([0, 600]);
+			var xAxis = d3.svg.axis()
+				.scale(scale)
+				.orient('bottom');
+			this._group.append('g').call(xAxis);
+			
+		}
+		private drawYAxis() {
+			var scale = d3.scale.linear();
+
+			scale.domain([0, 1]);
+			scale.range([800, 0]);
+			var axis = d3.svg.axis()
+				.scale(scale)
+				.orient('left');
+			this._group.append('g')
+				.call(axis)
+				.attr({
+				'transform': 'translate(30 0)'
+			});
+			
 		}
 	}
 }
