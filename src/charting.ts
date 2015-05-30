@@ -90,7 +90,7 @@ module charting {
 					.data(children)
 					.enter()
 					.append('circle')
-					.classed('.post', true)
+					.classed('post', true)
 					.attr({
 					'r': 2,
 					'cx':(d:reddit.redditChild,i)=>this._xScale(new Date(0).setSeconds(d.data.created)),

@@ -60,7 +60,7 @@ var charting;
                 _this._yScale.domain([minScore, maxScore]);
                 _this._yAxisGroup.call(_this._yAxis);
                 var dataGroup = _this._group.append('g');
-                dataGroup.selectAll('.post').data(children).enter().append('circle').classed('.post', true).attr({
+                dataGroup.selectAll('.post').data(children).enter().append('circle').classed('post', true).attr({
                     'r': 2,
                     'cx': function (d, i) { return _this._xScale(new Date(0).setSeconds(d.data.created)); },
                     'cy': function (d, i) { return _this._yScale(d.data.score); },

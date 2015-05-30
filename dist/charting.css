@@ -8,6 +8,9 @@ path.domain {
   fill: none;
   stroke: black;
 }
+.post {
+  fill: red;
+}
 body {
   font-family: 'Segoe UI';
 }
