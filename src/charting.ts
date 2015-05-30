@@ -84,6 +84,19 @@ module charting {
 				var maxScore = d3.max(children, c=> c.data.score);
 				this._yScale.domain([minScore, maxScore]);
 				this._yAxisGroup.call(this._yAxis);
+				
+				var dataGroup = this._group.append('g');
+				dataGroup.selectAll('.post')
+					.data(children)
+					.enter()
+					.append('circle')
+					.classed('.post', true)
+					.attr({
+					'r': 2,
+					'cx':(d:reddit.redditChild,i)=>this._xScale(new Date(0).setSeconds(d.data.created)),
+					'cy': (d: reddit.redditChild, i) => this._yScale(d.data.score),
+					'transform':'translate('+this._paddingLeft+','+0+')'
+				})
 			});
 		}
 	}
