@@ -1,6 +1,9 @@
 .tick {
   font-size: 12px;
 }
+.tick line {
+  stroke: black;
+}
 path.domain {
   fill: none;
   stroke: black;

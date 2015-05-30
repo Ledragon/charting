@@ -24,8 +24,13 @@ var charting;
             this.drawYAxis(height);
         };
         chart.prototype.drawXAxis = function (width) {
-            var scale = d3.scale.linear();
-            scale.domain([0, 1]);
+            var scale = d3.time.scale();
+            this._xScale = scale;
+            var endDate = new Date(2015, 0, 0);
+            var beginDate = new Date(2014, 0, 0);
+            console.log(beginDate);
+            console.log(endDate);
+            scale.domain([beginDate, endDate]);
             scale.range([0, width - this._paddingLeft]);
             var xAxis = d3.svg.axis().scale(scale).orient('bottom');
             this._group.append('g').call(xAxis).attr({
@@ -34,10 +39,10 @@ var charting;
         };
         chart.prototype.drawYAxis = function (height) {
             var paddingLeft = 30;
-            var scale = d3.scale.linear();
-            scale.domain([0, 1]);
-            scale.range([height - this._paddingBottom, 0]);
-            var axis = d3.svg.axis().scale(scale).orient('left');
+            this._yScale = d3.scale.linear();
+            this._yScale.domain([0, 1]);
+            this._yScale.range([height - this._paddingBottom, 0]);
+            var axis = d3.svg.axis().scale(this._yScale).orient('left');
             this._group.append('g').call(axis).attr({
                 'transform': 'translate(' + this._paddingLeft + ', 0)'
             });
