@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var typescript = require('gulp-typescript');
 var browserSync = require('browser-sync');
+var less = require('gulp-less');
 
 gulp.task('ts', function (){
 	return gulp.src(['./src/**/*.ts','typings/**/*.d.ts'])
@@ -10,8 +11,16 @@ gulp.task('ts', function (){
 		.pipe(gulp.dest('./dist'));
 });
 
-gulp.task('watch', ['watch-ts', 'browserSync'], function () {
+gulp.task('less', function () {
+	return gulp.src('./src/**/*.less')
+		.pipe(less({
 
+	}))
+		.pipe(gulp.dest('./dist'));
+});
+
+gulp.task('watch-less', function () {
+	gulp.watch(['./src/**/*.less'], ['less']);
 });
 
 gulp.task('watch-ts', function () {
@@ -23,6 +32,10 @@ gulp.task('browserSync', function () {
         server: './',
         index: './demo/index.html',
         port: 3030,
-        files: ['./dist/*', './demo/index.html']
+        files: ['./dist/*.*', './demo/index.html']
     });
+});
+
+gulp.task('watch', ['watch-ts', 'watch-less', 'browserSync'], function () {
+
 });

@@ -1,0 +1,10 @@
+.tick {
+  font-size: 12px;
+}
+path.domain {
+  fill: none;
+  stroke: black;
+}
+body {
+  font-family: 'Segoe UI';
+}
