@@ -30,10 +30,41 @@ var charting;
     })();
     charting.xAxis = xAxis;
 })(charting || (charting = {}));
+/// <reference path="../typings/d3/d3.d.ts"/>
+var charting;
+(function (charting) {
+    var yAxis = (function () {
+        function yAxis(container, height) {
+            this.init(container, height);
+        }
+        yAxis.prototype.init = function (container, height) {
+            this._scale = d3.scale.linear();
+            this._scale.range([height, 0]);
+            this._axis = d3.svg.axis().scale(this._scale).orient('left');
+            this._group = container.append('g');
+            this.update(0, 1);
+        };
+        yAxis.prototype.translate = function (translateX, translateY) {
+            this._group.attr({
+                'transform': 'translate(' + translateX + ',' + translateY + ')'
+            });
+        };
+        yAxis.prototype.update = function (min, max) {
+            this._scale.domain([min, max]);
+            this._group.call(this._axis);
+        };
+        yAxis.prototype.scale = function () {
+            return this._scale;
+        };
+        return yAxis;
+    })();
+    charting.yAxis = yAxis;
+})(charting || (charting = {}));
 /// <reference path="../typings/angularjs/angular.d.ts"/>
 /// <reference path="../typings/d3/d3.d.ts"/>
 /// <reference path="./reddit.d.ts"/>
 /// <reference path="./xAxis.ts"/>
+/// <reference path="./yAxis.ts"/>
 var charting;
 (function (charting) {
     var chart = (function () {
@@ -55,18 +86,10 @@ var charting;
             }).append('g');
             this._xAxis = new charting.xAxis(this._group, width);
             this._xAxis.translate(this._paddingLeft, (this._height - this._paddingBottom));
-            this.draw(width, height);
-        };
-        chart.prototype.draw = function (width, height) {
-            this.drawYAxis(height);
-        };
-        chart.prototype.drawYAxis = function (height) {
-            this._yScale = d3.scale.linear();
-            this._yScale.domain([0, 1]);
-            this._yScale.range([height - this._paddingBottom, this._paddingTop]);
-            this._yAxis = d3.svg.axis().scale(this._yScale).orient('left');
-            this._yAxisGroup = this._group.append('g').call(this._yAxis).attr({
-                'transform': 'translate(' + this._paddingLeft + ', 0)'
+            this._yAxis = new charting.yAxis(this._group, (height - this._paddingBottom - this._paddingTop));
+            this._yAxis.translate(this._paddingLeft, this._paddingTop);
+            this._dataGroup = this._group.append('g').classed('data', true).attr({
+                'transform': 'translate(' + 0 + ',' + this._paddingTop + ')'
             });
         };
         chart.prototype.update = function () {
@@ -79,15 +102,17 @@ var charting;
                 var xScale = _this._xAxis.scale();
                 var minScore = d3.min(children, function (c) { return c.data.score; });
                 var maxScore = d3.max(children, function (c) { return c.data.score; });
-                _this._yScale.domain([minScore, maxScore]);
-                _this._yAxisGroup.call(_this._yAxis);
-                var dataGroup = _this._group.append('g');
-                dataGroup.selectAll('.post').data(children).enter().append('circle').classed('post', true).attr({
+                _this._yAxis.update(minScore, maxScore);
+                var yScale = _this._yAxis.scale();
+                var dataSelection = _this._dataGroup.selectAll('.post').data(children);
+                dataSelection.enter().append('circle').classed('post', true);
+                dataSelection.attr({
                     'r': 4,
                     'cx': function (d, i) { return xScale(new Date(0).setSeconds(d.data.created)); },
-                    'cy': function (d, i) { return _this._yScale(d.data.score); },
+                    'cy': function (d, i) { return yScale(d.data.score); },
                     'transform': 'translate(' + _this._paddingLeft + ',' + 0 + ')'
                 });
+                dataSelection.exit().remove();
             });
         };
         return chart;
