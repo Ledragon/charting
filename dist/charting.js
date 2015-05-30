@@ -1,6 +1,39 @@
+/// <reference path="../typings/d3/d3.d.ts"/>
+var charting;
+(function (charting) {
+    var xAxis = (function () {
+        function xAxis(container, width) {
+            this.init(container, width);
+        }
+        xAxis.prototype.init = function (container, width) {
+            this._scale = d3.time.scale();
+            this._scale.range([0, width]);
+            this._axis = d3.svg.axis().scale(this._scale).orient('bottom');
+            this._group = container.append('g');
+            var endDate = new Date(2015, 0, 0);
+            var beginDate = new Date(2014, 0, 0);
+            this.update(beginDate, endDate);
+        };
+        xAxis.prototype.translate = function (translateX, translateY) {
+            this._group.attr({
+                'transform': 'translate(' + translateX + ',' + translateY + ')'
+            });
+        };
+        xAxis.prototype.update = function (beginDate, endDate) {
+            this._scale.domain([beginDate, endDate]);
+            this._group.call(this._axis);
+        };
+        xAxis.prototype.scale = function () {
+            return this._scale;
+        };
+        return xAxis;
+    })();
+    charting.xAxis = xAxis;
+})(charting || (charting = {}));
 /// <reference path="../typings/angularjs/angular.d.ts"/>
 /// <reference path="../typings/d3/d3.d.ts"/>
 /// <reference path="./reddit.d.ts"/>
+/// <reference path="./xAxis.ts"/>
 var charting;
 (function (charting) {
     var chart = (function () {
@@ -20,23 +53,12 @@ var charting;
                 'width': width,
                 'height': height
             }).append('g');
+            this._xAxis = new charting.xAxis(this._group, width);
+            this._xAxis.translate(this._paddingLeft, (this._height - this._paddingBottom));
             this.draw(width, height);
         };
         chart.prototype.draw = function (width, height) {
-            this.drawXAxis(width);
             this.drawYAxis(height);
-        };
-        chart.prototype.drawXAxis = function (width) {
-            var scale = d3.time.scale();
-            this._xScale = scale;
-            var endDate = new Date(2015, 0, 0);
-            var beginDate = new Date(2014, 0, 0);
-            scale.domain([beginDate, endDate]);
-            scale.range([0, width - this._paddingLeft]);
-            this._xAxis = d3.svg.axis().scale(scale).orient('bottom');
-            this._xAxisGroup = this._group.append('g').call(this._xAxis).attr({
-                'transform': 'translate(' + this._paddingLeft + ',' + (this._height - this._paddingBottom) + ')'
-            });
         };
         chart.prototype.drawYAxis = function (height) {
             this._yScale = d3.scale.linear();
@@ -53,16 +75,16 @@ var charting;
                 var children = data.data.children;
                 var minDate = new Date(new Date(0).setSeconds(d3.min(children, function (c) { return c.data.created; })));
                 var maxDate = new Date(new Date(0).setSeconds(d3.max(children, function (c) { return c.data.created; })));
-                _this._xScale.domain([minDate, maxDate]);
-                _this._xAxisGroup.call(_this._xAxis);
+                _this._xAxis.update(minDate, maxDate);
+                var xScale = _this._xAxis.scale();
                 var minScore = d3.min(children, function (c) { return c.data.score; });
                 var maxScore = d3.max(children, function (c) { return c.data.score; });
                 _this._yScale.domain([minScore, maxScore]);
                 _this._yAxisGroup.call(_this._yAxis);
                 var dataGroup = _this._group.append('g');
                 dataGroup.selectAll('.post').data(children).enter().append('circle').classed('post', true).attr({
-                    'r': 2,
-                    'cx': function (d, i) { return _this._xScale(new Date(0).setSeconds(d.data.created)); },
+                    'r': 4,
+                    'cx': function (d, i) { return xScale(new Date(0).setSeconds(d.data.created)); },
                     'cy': function (d, i) { return _this._yScale(d.data.score); },
                     'transform': 'translate(' + _this._paddingLeft + ',' + 0 + ')'
                 });
