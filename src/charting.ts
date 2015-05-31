@@ -18,7 +18,6 @@ module charting {
 
 		constructor(container: any) {
 			this.init(container);
-			this.update();
 		}
 
 		private init(container) {
@@ -44,25 +43,19 @@ module charting {
 					'transform': 'translate(' + 0 + ',' + this._paddingTop + ')'
 				});
 		}
-
-		private update() {
-			d3.json('http://api.reddit.com/', (error, data: reddit.redditObject) => {
-				var children = data.data.children;
-
-				var minDate = new Date(new Date(0).setSeconds(d3.min(children, c=> c.data.created)));
-				var maxDate = new Date(new Date(0).setSeconds(d3.max(children, c=> c.data.created)));
-				this._xAxis.update(minDate, maxDate);
-				var xScale = this._xAxis.scale();
-
-
-				var minScore = d3.min(children, c=> c.data.score);
-				var maxScore = d3.max(children, c=> c.data.score);
-				this._yAxis.update(minScore, maxScore);
-				var yScale = this._yAxis.scale();
-				
+		
+		update(data: any) {
+				var minDate = d3.min(data, (d:any)=> d.date);
+				var maxDate = d3.max(data, (d:any)=> d.date);
+				var xScale = this._xAxis.update(minDate, maxDate);
+			
+				var minScore = d3.min(data, (d:any)=> d.value);
+				var maxScore = d3.max(data, (d:any)=> d.value);
+				var yScale = this._yAxis.update(minScore, maxScore);
+			
 				var dataSelection = this._dataGroup
 					.selectAll('.post')
-					.data(children);
+					.data(data);
 				
 				dataSelection.enter()
 					.append('circle')
@@ -70,13 +63,12 @@ module charting {
 
 				dataSelection.attr({
 					'r': 4,
-					'cx': (d: reddit.redditChild, i) => xScale(new Date(0).setSeconds(d.data.created)),
-					'cy': (d: reddit.redditChild, i) => yScale(d.data.score),
+					'cx': (d: any, i) => xScale(d.date),
+					'cy': (d: any, i) => yScale(d.value),
 					'transform': 'translate(' + this._paddingLeft + ',' + 0 + ')'
 				});
 				
 				dataSelection.exit().remove();
-			});
 		}
 	}
 }

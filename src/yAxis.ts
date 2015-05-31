@@ -27,9 +27,10 @@ module charting{
 			});
 		}
 		
-		update(min:number, max:number) {
+		update(min:number, max:number):D3.Scale.LinearScale {
 			this._scale.domain([min, max]);
 			this._group.call(this._axis);
+			return this._scale;
 		}
 		
 		scale() {

@@ -29,9 +29,10 @@ module charting{
 			});
 		}
 		
-		update(beginDate: Date, endDate: Date) {
+		update(beginDate: Date, endDate: Date):D3.Scale.TimeScale {
 			this._scale.domain([beginDate, endDate]);
 			this._group.call(this._axis);
+			return this._scale;
 		}
 		
 		scale() {

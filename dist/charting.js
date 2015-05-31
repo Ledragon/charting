@@ -22,6 +22,7 @@ var charting;
         xAxis.prototype.update = function (beginDate, endDate) {
             this._scale.domain([beginDate, endDate]);
             this._group.call(this._axis);
+            return this._scale;
         };
         xAxis.prototype.scale = function () {
             return this._scale;
@@ -52,6 +53,7 @@ var charting;
         yAxis.prototype.update = function (min, max) {
             this._scale.domain([min, max]);
             this._group.call(this._axis);
+            return this._scale;
         };
         yAxis.prototype.scale = function () {
             return this._scale;
@@ -73,7 +75,6 @@ var charting;
             this._paddingBottom = 30;
             this._paddingTop = 30;
             this.init(container);
-            this.update();
         }
         chart.prototype.init = function (container) {
             var selection = d3.select(container);
@@ -92,28 +93,22 @@ var charting;
                 'transform': 'translate(' + 0 + ',' + this._paddingTop + ')'
             });
         };
-        chart.prototype.update = function () {
-            var _this = this;
-            d3.json('http://api.reddit.com/', function (error, data) {
-                var children = data.data.children;
-                var minDate = new Date(new Date(0).setSeconds(d3.min(children, function (c) { return c.data.created; })));
-                var maxDate = new Date(new Date(0).setSeconds(d3.max(children, function (c) { return c.data.created; })));
-                _this._xAxis.update(minDate, maxDate);
-                var xScale = _this._xAxis.scale();
-                var minScore = d3.min(children, function (c) { return c.data.score; });
-                var maxScore = d3.max(children, function (c) { return c.data.score; });
-                _this._yAxis.update(minScore, maxScore);
-                var yScale = _this._yAxis.scale();
-                var dataSelection = _this._dataGroup.selectAll('.post').data(children);
-                dataSelection.enter().append('circle').classed('post', true);
-                dataSelection.attr({
-                    'r': 4,
-                    'cx': function (d, i) { return xScale(new Date(0).setSeconds(d.data.created)); },
-                    'cy': function (d, i) { return yScale(d.data.score); },
-                    'transform': 'translate(' + _this._paddingLeft + ',' + 0 + ')'
-                });
-                dataSelection.exit().remove();
+        chart.prototype.update = function (data) {
+            var minDate = d3.min(data, function (d) { return d.date; });
+            var maxDate = d3.max(data, function (d) { return d.date; });
+            var xScale = this._xAxis.update(minDate, maxDate);
+            var minScore = d3.min(data, function (d) { return d.value; });
+            var maxScore = d3.max(data, function (d) { return d.value; });
+            var yScale = this._yAxis.update(minScore, maxScore);
+            var dataSelection = this._dataGroup.selectAll('.post').data(data);
+            dataSelection.enter().append('circle').classed('post', true);
+            dataSelection.attr({
+                'r': 4,
+                'cx': function (d, i) { return xScale(d.date); },
+                'cy': function (d, i) { return yScale(d.value); },
+                'transform': 'translate(' + this._paddingLeft + ',' + 0 + ')'
             });
+            dataSelection.exit().remove();
         };
         return chart;
     })();
