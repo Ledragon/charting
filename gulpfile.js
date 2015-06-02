@@ -30,9 +30,9 @@ gulp.task('watch-ts', function () {
 gulp.task('browserSync', function () {
 	browserSync.init({
         server: './',
-        index: './demo/index.html',
+        index: './test/index.html',
         port: 3030,
-        files: ['./dist/*.*', './demo/index.html']
+        files: ['./dist/*.*', './test/index.html']
     });
 });
 
