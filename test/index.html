@@ -1,34 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Test charting</title>
     <link rel="stylesheet" href="../dist/charting.css">
 </head>
+
 <body>
     <div style="width:800px; height:600px;" id="test">
 
     </div>
     <div>
         <button type="button" onclick="update()">Update</button>
-        <div>
+    </div>
     <script src="../bower_components/d3/d3.min.js"></script>
     <script src="../dist/charting.js"></script>
     <script>
         var chart = new charting.chart('#test');
-        
-        function update(){
-            d3.json('http://api.reddit.com/', function(error, data){
+
+        function update() {
+            d3.json('http://api.reddit.com/', function (error, data) {
                 var prepared = [];
-                data.data.children.forEach(function(c){
-                   prepared.push({
-                       value:c.data.score,
-                       date: new Date(0).setSeconds(c.data.created)
-                   }) ;
+                data.data.children.forEach(function (c) {
+                    prepared.push({
+                        value: c.data.score,
+                        date: new Date(0).setSeconds(c.data.created)
+                    });
                 });
                 chart.update(prepared);
             });
         }
     </script>
 </body>
+
 </html>

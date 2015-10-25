@@ -1,6 +1,7 @@
 /// <reference path="../typings/angularjs/angular.d.ts"/>
 /// <reference path="../typings/d3/d3.d.ts"/>
 /// <reference path="./reddit.d.ts"/>
+/// <reference path="./dataPoint.d.ts"/>
 /// <reference path="./xAxis.ts"/>
 /// <reference path="./yAxis.ts"/>
 module charting {
