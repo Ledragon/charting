@@ -65,6 +65,7 @@ var charting;
 /// <reference path="../typings/angularjs/angular.d.ts"/>
 /// <reference path="../typings/d3/d3.d.ts"/>
 /// <reference path="./reddit.d.ts"/>
+/// <reference path="./dataPoint.d.ts"/>
 /// <reference path="./xAxis.ts"/>
 /// <reference path="./yAxis.ts"/>
 var charting;
@@ -101,7 +102,7 @@ var charting;
             var maxScore = d3.max(data, function (d) { return d.value; });
             var yScale = this._yAxis.update(minScore, maxScore);
             var dataSelection = this._dataGroup.selectAll('.post').data(data);
-            dataSelection.enter().append('circle').classed('post', true);
+            dataSelection.enter().append('circle').classed('post', true).on('mouseover', this.onMouseover());
             dataSelection.attr({
                 'r': 4,
                 'cx': function (d, i) { return xScale(d.date); },
@@ -109,6 +110,18 @@ var charting;
                 'transform': 'translate(' + this._paddingLeft + ',' + 0 + ')'
             });
             dataSelection.exit().remove();
+        };
+        chart.prototype.onMouseover = function () {
+            var _this = this;
+            return function (d, i) {
+                d3.select(d3.event.currentTarget).style({
+                    'fill': 'yellow'
+                });
+                _this.logData(d);
+            };
+        };
+        chart.prototype.logData = function (d) {
+            console.log(d);
         };
         return chart;
     })();

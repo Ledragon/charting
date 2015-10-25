@@ -60,7 +60,8 @@ module charting {
 
             dataSelection.enter()
                 .append('circle')
-                .classed('post', true);
+                .classed('post', true)
+                .on('mouseover', this.onMouseover());
 
             dataSelection.attr({
                 'r': 4,
@@ -70,6 +71,19 @@ module charting {
             });
 
             dataSelection.exit().remove();
+        }
+
+        private onMouseover(): (d, i) => void {
+            return (d, i) => {
+                d3.select(d3.event.currentTarget).style({
+                    'fill': 'yellow'
+                });
+                this.logData(d);
+            }
+        }
+
+        private logData(d: any) {
+            console.log(d);
         }
     }
 }
