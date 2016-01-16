@@ -11,6 +11,7 @@ module charting {
         private _paddingBottom = 30;
         private _paddingTop = 30;
         private _height: number;
+        private _ratio = 3 / 4;
 
         private _xAxis: xAxis;
         private _yAxis: yAxis;
@@ -24,10 +25,7 @@ module charting {
         private init(container) {
             var selection = d3.select(container);
             var width = selection.node().clientWidth;
-            var height = selection.node().clientHeight;
-            if (!height) {
-                height = 3 / 4 * width;
-            }
+            var height = this._ratio * width;
             this._height = height;
             var svg = selection.append('svg')
                 .attr({
@@ -50,14 +48,16 @@ module charting {
 
             d3.select(window).on('resize', () => {
                 var width = selection.node().clientWidth;
-                var height = 3 / 4 * width;
+                var height = this._ratio * width;
                 svg.attr({
                     'width': width,
                     'height': height
                 });
                 this._height = height;
                 this._xAxis.resize(width, height);
-            this._xAxis.translate(this._paddingLeft, (this._height - this._paddingBottom));
+                this._xAxis.translate(this._paddingLeft, (this._height - this._paddingBottom));
+                this._yAxis.resize(width, height - this._paddingBottom - this._paddingTop);
+
             });
         }
 

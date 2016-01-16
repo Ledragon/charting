@@ -62,6 +62,10 @@ var charting;
         yAxis.prototype.scale = function () {
             return this._scale;
         };
+        yAxis.prototype.resize = function (width, height) {
+            this._scale.range([height, 0]);
+            this._group.call(this._axis);
+        };
         return yAxis;
     })();
     charting.yAxis = yAxis;
@@ -79,16 +83,14 @@ var charting;
             this._paddingLeft = 50;
             this._paddingBottom = 30;
             this._paddingTop = 30;
+            this._ratio = 3 / 4;
             this.init(container);
         }
         chart.prototype.init = function (container) {
             var _this = this;
             var selection = d3.select(container);
             var width = selection.node().clientWidth;
-            var height = selection.node().clientHeight;
-            if (!height) {
-                height = 3 / 4 * width;
-            }
+            var height = this._ratio * width;
             this._height = height;
             var svg = selection.append('svg').attr({
                 'width': width,
@@ -104,7 +106,7 @@ var charting;
             });
             d3.select(window).on('resize', function () {
                 var width = selection.node().clientWidth;
-                var height = 3 / 4 * width;
+                var height = _this._ratio * width;
                 svg.attr({
                     'width': width,
                     'height': height
@@ -112,6 +114,7 @@ var charting;
                 _this._height = height;
                 _this._xAxis.resize(width, height);
                 _this._xAxis.translate(_this._paddingLeft, (_this._height - _this._paddingBottom));
+                _this._yAxis.resize(width, height - _this._paddingBottom - _this._paddingTop);
             });
         };
         chart.prototype.update = function (data) {
