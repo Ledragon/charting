@@ -37,6 +37,12 @@ module charting{
 		
 		scale() {
 			return this._scale;
-		}
+        }
+        
+        resize(width: number, height: number) {
+			this._scale.range([0, width]);
+			this._group.call(this._axis);
+            
+        }
 	}
 }

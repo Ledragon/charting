@@ -25,12 +25,16 @@ module charting {
             var selection = d3.select(container);
             var width = selection.node().clientWidth;
             var height = selection.node().clientHeight;
+            if (!height) {
+                height = 3 / 4 * width;
+            }
             this._height = height;
-            this._group = selection.append('svg')
+            var svg = selection.append('svg')
                 .attr({
                     'width': width,
                     'height': height
-                })
+                });
+            this._group = svg
                 .append('g');
 
             this._xAxis = new xAxis(this._group, width);
@@ -43,6 +47,18 @@ module charting {
                 .attr({
                     'transform': 'translate(' + 0 + ',' + this._paddingTop + ')'
                 });
+
+            d3.select(window).on('resize', () => {
+                var width = selection.node().clientWidth;
+                var height = 3 / 4 * width;
+                svg.attr({
+                    'width': width,
+                    'height': height
+                });
+                this._height = height;
+                this._xAxis.resize(width, height);
+            this._xAxis.translate(this._paddingLeft, (this._height - this._paddingBottom));
+            });
         }
 
         update(data: Array<dataPoint>) {

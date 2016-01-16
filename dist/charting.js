@@ -27,6 +27,10 @@ var charting;
         xAxis.prototype.scale = function () {
             return this._scale;
         };
+        xAxis.prototype.resize = function (width, height) {
+            this._scale.range([0, width]);
+            this._group.call(this._axis);
+        };
         return xAxis;
     })();
     charting.xAxis = xAxis;
@@ -78,20 +82,36 @@ var charting;
             this.init(container);
         }
         chart.prototype.init = function (container) {
+            var _this = this;
             var selection = d3.select(container);
             var width = selection.node().clientWidth;
             var height = selection.node().clientHeight;
+            if (!height) {
+                height = 3 / 4 * width;
+            }
             this._height = height;
-            this._group = selection.append('svg').attr({
+            var svg = selection.append('svg').attr({
                 'width': width,
                 'height': height
-            }).append('g');
+            });
+            this._group = svg.append('g');
             this._xAxis = new charting.xAxis(this._group, width);
             this._xAxis.translate(this._paddingLeft, (this._height - this._paddingBottom));
             this._yAxis = new charting.yAxis(this._group, (height - this._paddingBottom - this._paddingTop));
             this._yAxis.translate(this._paddingLeft, this._paddingTop);
             this._dataGroup = this._group.append('g').classed('data', true).attr({
                 'transform': 'translate(' + 0 + ',' + this._paddingTop + ')'
+            });
+            d3.select(window).on('resize', function () {
+                var width = selection.node().clientWidth;
+                var height = 3 / 4 * width;
+                svg.attr({
+                    'width': width,
+                    'height': height
+                });
+                _this._height = height;
+                _this._xAxis.resize(width, height);
+                _this._xAxis.translate(_this._paddingLeft, (_this._height - _this._paddingBottom));
             });
         };
         chart.prototype.update = function (data) {
