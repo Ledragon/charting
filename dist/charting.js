@@ -90,31 +90,36 @@ var charting;
             var _this = this;
             var selection = d3.select(container);
             var width = selection.node().clientWidth;
-            var height = this._ratio * width;
-            this._height = height;
-            var svg = selection.append('svg').attr({
-                'width': width,
-                'height': height
-            });
+            var svg = selection.append('svg');
             this._group = svg.append('g');
             this._xAxis = new charting.xAxis(this._group, width);
             this._xAxis.translate(this._paddingLeft, (this._height - this._paddingBottom));
-            this._yAxis = new charting.yAxis(this._group, (height - this._paddingBottom - this._paddingTop));
+            this._yAxis = new charting.yAxis(this._group, 1);
             this._yAxis.translate(this._paddingLeft, this._paddingTop);
             this._dataGroup = this._group.append('g').classed('data', true).attr({
                 'transform': 'translate(' + 0 + ',' + this._paddingTop + ')'
             });
+            this.resize(selection, svg);
             d3.select(window).on('resize', function () {
-                var width = selection.node().clientWidth;
-                var height = _this._ratio * width;
-                svg.attr({
-                    'width': width,
-                    'height': height
-                });
-                _this._height = height;
-                _this._xAxis.resize(width, height);
-                _this._xAxis.translate(_this._paddingLeft, (_this._height - _this._paddingBottom));
-                _this._yAxis.resize(width, height - _this._paddingBottom - _this._paddingTop);
+                _this.resize(selection, svg);
+            });
+        };
+        chart.prototype.resize = function (selection, svg) {
+            var _this = this;
+            var width = selection.node().clientWidth;
+            var height = this._ratio * width;
+            svg.attr({
+                'width': width,
+                'height': height
+            });
+            this._height = height;
+            this._xAxis.resize(width, height);
+            this._xAxis.translate(this._paddingLeft, (this._height - this._paddingBottom));
+            this._yAxis.resize(width, height - this._paddingBottom - this._paddingTop);
+            this._dataGroup.selectAll('.post').attr({
+                'r': 4,
+                'cx': function (d, i) { return _this._xAxis.scale()(d.date); },
+                'cy': function (d, i) { return _this._yAxis.scale()(d.value); }
             });
         };
         chart.prototype.update = function (data) {
