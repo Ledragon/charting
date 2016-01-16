@@ -11,6 +11,7 @@ module charting {
         private _paddingLeft = 50;
         private _paddingBottom = 30;
         private _paddingTop = 30;
+        private _width: number;
         private _height: number;
         private _ratio = 3 / 4;
 
@@ -50,6 +51,7 @@ module charting {
 
         private resize() {
             var width = this._container.node().clientWidth;
+            this._width = width;
             var height = this._ratio * width;
             this._container.select('svg')
                 .attr({
@@ -63,7 +65,7 @@ module charting {
             this._dataGroup
                 .selectAll('.post')
                 .attr({
-                    'r': 4,
+                    'r': 3,
                     'cx': (d: any, i) => this._xAxis.scale()(d.date),
                     'cy': (d: any, i) => this._yAxis.scale()(d.value)
                 });
@@ -112,7 +114,7 @@ module charting {
                 .on('mouseout', this.onMouseout());
 
             dataSelection.attr({
-                'r': 4,
+                'r': 3,
                 'cx': (d: any, i) => xScale(d.date),
                 'cy': (d: any, i) => yScale(d.value),
                 'transform': 'translate(' + this._paddingLeft + ',' + 0 + ')'

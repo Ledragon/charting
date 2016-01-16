@@ -120,6 +120,7 @@ var charting;
         chart.prototype.resize = function () {
             var _this = this;
             var width = this._container.node().clientWidth;
+            this._width = width;
             var height = this._ratio * width;
             this._container.select('svg').attr({
                 'width': width,
@@ -130,7 +131,7 @@ var charting;
             this._xAxis.translate(this._paddingLeft, (this._height - this._paddingBottom));
             this._yAxis.resize(width, height - this._paddingBottom - this._paddingTop);
             this._dataGroup.selectAll('.post').attr({
-                'r': 4,
+                'r': 3,
                 'cx': function (d, i) { return _this._xAxis.scale()(d.date); },
                 'cy': function (d, i) { return _this._yAxis.scale()(d.value); }
             });
@@ -166,7 +167,7 @@ var charting;
             var dataSelection = this._dataGroup.selectAll('.post').data(data);
             dataSelection.enter().append('circle').classed('post', true).on('mouseover', this.onMouseover()).on('mouseout', this.onMouseout());
             dataSelection.attr({
-                'r': 4,
+                'r': 3,
                 'cx': function (d, i) { return xScale(d.date); },
                 'cy': function (d, i) { return yScale(d.value); },
                 'transform': 'translate(' + this._paddingLeft + ',' + 0 + ')'
