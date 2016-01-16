@@ -6,6 +6,7 @@
 /// <reference path="./yAxis.ts"/>
 module charting {
     export class chart {
+        private _container: D3.Selection;
         private _group: D3.Selection;
         private _paddingLeft = 50;
         private _paddingBottom = 30;
@@ -24,6 +25,7 @@ module charting {
 
         private init(container) {
             var selection = d3.select(container);
+            this._container = selection;
             var width = selection.node().clientWidth;
             var svg = selection.append('svg');
             this._group = svg
@@ -39,20 +41,21 @@ module charting {
                 .attr({
                     'transform': 'translate(' + 0 + ',' + this._paddingTop + ')'
                 });
-            this.resize(selection, svg);
+            this.resize();
             d3.select(window)
                 .on('resize', () => {
-                    this.resize(selection, svg);
+                    this.resize();
                 });
         }
 
-        private resize(selection, svg) {
-            var width = selection.node().clientWidth;
+        private resize() {
+            var width = this._container.node().clientWidth;
             var height = this._ratio * width;
-            svg.attr({
-                'width': width,
-                'height': height
-            });
+            this._container.select('svg')
+                .attr({
+                    'width': width,
+                    'height': height
+                });
             this._height = height;
             this._xAxis.resize(width, height);
             this._xAxis.translate(this._paddingLeft, (this._height - this._paddingBottom));
@@ -64,6 +67,29 @@ module charting {
                     'cx': (d: any, i) => this._xAxis.scale()(d.date),
                     'cy': (d: any, i) => this._yAxis.scale()(d.value)
                 });
+        }
+
+        private onMouseover(): (d, i) => void {
+            return (d, i) => {
+                d3.select(d3.event.currentTarget)
+                    .style({
+                        'fill': 'yellow'
+                    });
+                this.logData(d);
+            }
+        }
+
+        private onMouseout(): (d, i) => void {
+            return (d, i) => {
+                d3.select(d3.event.currentTarget).style({
+                    'fill': ''
+                });
+                this.logData(d);
+            }
+        }
+
+        private logData(d: any) {
+            console.log(d);
         }
 
         update(data: Array<dataPoint>) {
@@ -82,7 +108,8 @@ module charting {
             dataSelection.enter()
                 .append('circle')
                 .classed('post', true)
-                .on('mouseover', this.onMouseover());
+                .on('mouseover', this.onMouseover())
+                .on('mouseout', this.onMouseout());
 
             dataSelection.attr({
                 'r': 4,
@@ -94,17 +121,13 @@ module charting {
             dataSelection.exit().remove();
         }
 
-        private onMouseover(): (d, i) => void {
-            return (d, i) => {
-                d3.select(d3.event.currentTarget).style({
-                    'fill': 'yellow'
-                });
-                this.logData(d);
+        ratio(value?: number): number | chart {
+            if (arguments) {
+                this._ratio = 1/value;
+                this.resize();
+                return this;
             }
-        }
-
-        private logData(d: any) {
-            console.log(d);
+            return this._ratio;
         }
     }
 }

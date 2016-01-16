@@ -7,7 +7,7 @@ var charting;
         }
         xAxis.prototype.init = function (container, width) {
             this._scale = d3.time.scale();
-            this._scale.range([0, width]);
+            this._scale.range([0, width]).ticks(15);
             this._axis = d3.svg.axis().scale(this._scale).orient('bottom');
             this._group = container.append('g');
             var endDate = new Date(2015, 0, 0);
@@ -29,6 +29,12 @@ var charting;
         };
         xAxis.prototype.resize = function (width, height) {
             this._scale.range([0, width]);
+            if (width < 650) {
+                this._axis.ticks(5);
+            }
+            else {
+                this._axis.ticks(10);
+            }
             this._group.call(this._axis);
         };
         return xAxis;
@@ -64,6 +70,12 @@ var charting;
         };
         yAxis.prototype.resize = function (width, height) {
             this._scale.range([height, 0]);
+            if (height < 250) {
+                this._axis.ticks(5);
+            }
+            else {
+                this._axis.ticks(10);
+            }
             this._group.call(this._axis);
         };
         return yAxis;
@@ -89,6 +101,7 @@ var charting;
         chart.prototype.init = function (container) {
             var _this = this;
             var selection = d3.select(container);
+            this._container = selection;
             var width = selection.node().clientWidth;
             var svg = selection.append('svg');
             this._group = svg.append('g');
@@ -99,16 +112,16 @@ var charting;
             this._dataGroup = this._group.append('g').classed('data', true).attr({
                 'transform': 'translate(' + 0 + ',' + this._paddingTop + ')'
             });
-            this.resize(selection, svg);
+            this.resize();
             d3.select(window).on('resize', function () {
-                _this.resize(selection, svg);
+                _this.resize();
             });
         };
-        chart.prototype.resize = function (selection, svg) {
+        chart.prototype.resize = function () {
             var _this = this;
-            var width = selection.node().clientWidth;
+            var width = this._container.node().clientWidth;
             var height = this._ratio * width;
-            svg.attr({
+            this._container.select('svg').attr({
                 'width': width,
                 'height': height
             });
@@ -122,23 +135,6 @@ var charting;
                 'cy': function (d, i) { return _this._yAxis.scale()(d.value); }
             });
         };
-        chart.prototype.update = function (data) {
-            var minDate = d3.min(data, function (d) { return d.date; });
-            var maxDate = d3.max(data, function (d) { return d.date; });
-            var xScale = this._xAxis.update(minDate, maxDate);
-            var minScore = d3.min(data, function (d) { return d.value; });
-            var maxScore = d3.max(data, function (d) { return d.value; });
-            var yScale = this._yAxis.update(minScore, maxScore);
-            var dataSelection = this._dataGroup.selectAll('.post').data(data);
-            dataSelection.enter().append('circle').classed('post', true).on('mouseover', this.onMouseover());
-            dataSelection.attr({
-                'r': 4,
-                'cx': function (d, i) { return xScale(d.date); },
-                'cy': function (d, i) { return yScale(d.value); },
-                'transform': 'translate(' + this._paddingLeft + ',' + 0 + ')'
-            });
-            dataSelection.exit().remove();
-        };
         chart.prototype.onMouseover = function () {
             var _this = this;
             return function (d, i) {
@@ -148,8 +144,42 @@ var charting;
                 _this.logData(d);
             };
         };
+        chart.prototype.onMouseout = function () {
+            var _this = this;
+            return function (d, i) {
+                d3.select(d3.event.currentTarget).style({
+                    'fill': ''
+                });
+                _this.logData(d);
+            };
+        };
         chart.prototype.logData = function (d) {
             console.log(d);
+        };
+        chart.prototype.update = function (data) {
+            var minDate = d3.min(data, function (d) { return d.date; });
+            var maxDate = d3.max(data, function (d) { return d.date; });
+            var xScale = this._xAxis.update(minDate, maxDate);
+            var minScore = d3.min(data, function (d) { return d.value; });
+            var maxScore = d3.max(data, function (d) { return d.value; });
+            var yScale = this._yAxis.update(minScore, maxScore);
+            var dataSelection = this._dataGroup.selectAll('.post').data(data);
+            dataSelection.enter().append('circle').classed('post', true).on('mouseover', this.onMouseover()).on('mouseout', this.onMouseout());
+            dataSelection.attr({
+                'r': 4,
+                'cx': function (d, i) { return xScale(d.date); },
+                'cy': function (d, i) { return yScale(d.value); },
+                'transform': 'translate(' + this._paddingLeft + ',' + 0 + ')'
+            });
+            dataSelection.exit().remove();
+        };
+        chart.prototype.ratio = function (value) {
+            if (arguments) {
+                this._ratio = 1 / value;
+                this.resize();
+                return this;
+            }
+            return this._ratio;
         };
         return chart;
     })();

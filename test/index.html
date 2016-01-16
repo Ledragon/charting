@@ -18,7 +18,7 @@
     <script src="../dist/charting.js"></script>
     <script>
         var chart = new charting.chart('#test');
-
+        chart.ratio(16/9);
         function update() {
             d3.json('http://api.reddit.com/', function (error, data) {
                 var prepared = [];

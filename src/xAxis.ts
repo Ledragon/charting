@@ -11,7 +11,8 @@ module charting{
 		
 		private init(container:D3.Selection, width: number) {
 			this._scale = d3.time.scale();
-			this._scale.range([0, width]);
+            this._scale.range([0, width])
+                .ticks(15);
 			this._axis = d3.svg.axis()
 				.scale(this._scale)
 				.orient('bottom');
@@ -40,7 +41,13 @@ module charting{
         }
         
         resize(width: number, height: number) {
-			this._scale.range([0, width]);
+            this._scale.range([0, width]);
+            if (width < 650) {
+                this._axis.ticks(5);
+            } else {
+                this._axis.ticks(10);
+                
+            }
 			this._group.call(this._axis);
             
         }

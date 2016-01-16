@@ -38,7 +38,14 @@ module charting{
         }
         
         resize(width: number, height: number) {
-			this._scale.range([height, 0]);
+            this._scale.range([height, 0]);
+            
+            if (height < 250) {
+                this._axis.ticks(5);
+            } else {
+                this._axis.ticks(10);
+                
+            }
 			this._group.call(this._axis);
             
         }
